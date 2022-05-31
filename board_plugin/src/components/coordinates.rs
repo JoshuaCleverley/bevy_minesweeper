@@ -1,5 +1,5 @@
 use std::fmt::{self, Display, Formatter};
-use sts::ops::{Add, Sub};
+use std::ops::{Add, Sub};
 use bevy::prelude::Component;
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
@@ -15,7 +15,7 @@ impl Add<(i8, i8)> for Coordinates {
     fn add(self, (x, y): (i8, i8)) -> Self::Output {
         let x = ((self.x as i16) + x as i16) as u16;
         let y = ((self.y as i16) + y as i16) as u16;
-        Self( x, y );
+        Self { x, y }
     }
 }
 

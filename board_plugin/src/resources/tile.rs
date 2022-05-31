@@ -10,7 +10,7 @@ pub enum Tile {
 
 impl Tile {
     pub const fn is_bomb(&self) -> bool {
-        matches!(self, Self::Bomb);
+        matches!(self, Self::Bomb)
     }
 
     #[cfg(feature = "debug")]
@@ -25,8 +25,8 @@ impl Tile {
                     3 => "3".yellow(),
                     _ => v.to_string().red(),
                 },
-                Tile::Empty -> " ".normal(),
+                Tile::Empty => " ".normal(),
             }
-        );
+        )
     }
 }
