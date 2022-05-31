@@ -7,6 +7,7 @@ use resources::tile_map::TileMap;
 use resources::BoardOptions;
 use resources::TileSize;
 use resources::BoardPosition;
+use components::Coordinates;
 
 pub struct BoardPlugin;
 
@@ -59,7 +60,45 @@ impl BoardPlugin {
             .spawn()
             .insert(Name::new("Board"))
             .insert(Transform::from_translation(board_position))
-            .insert(GlobalTransform::default());
+            .insert(GlobalTransform::default())
+            .with_children(|parent| {
+                parent
+                    .spawn_bundle(SpriteBundle {
+                        sprite: Sprite {
+                            color: Color::WHITE,
+                            custom_size: Some(board_size),
+                            ..Default::default()
+                        },
+                        transform: Transform::from_xyz(board_size.x / 2.0, board_size.y / 2.0, 0.0),
+                        ..Default::default()
+                    })
+                    .insert(Name::new("Background"));
+                for (y, line) in tile_map.iter().enumerate() {
+                    for (x, tile) in line.iter().enumerate() {
+                        parent
+                            .spawn_bundle(SpriteBundle {
+                                sprite: Sprite {
+                                    color: Color::GRAY,
+                                    custom_size: Some(Vec2::splat(
+                                        tile_size - options.tile_padding as f32,
+                                    )),
+                                    ..Default::default()
+                                },
+                                transform: Transform::from_xyz(
+                                    (x as f32 * tile_size) + (tile_size / 2.0),
+                                    (y as f32 * tile_size) + (tile_size / 2.0),
+                                    1.0,
+                                ),
+                                ..Default::default()
+                            })
+                            .insert(Name::new(format!("Tile ({}, {})", x, y)))
+                            .insert(Coordinates {
+                                x: x as u16,
+                                y: y as u16,
+                            });
+                    }
+                }
+            });
     }
 
     fn adaptive_tile_size(
