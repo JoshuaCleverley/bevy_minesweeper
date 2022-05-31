@@ -1,14 +1,20 @@
 pub mod components;
 pub mod resources;
 
+mod bounds;
+
 use bevy::prelude::*;
+use bevy::math::Vec3Swizzles;
 use bevy::log;
+
+use bounds::Bounds2;
 
 use resources::tile_map::TileMap;
 use resources::BoardOptions;
 use resources::TileSize;
 use resources::BoardPosition;
 use resources::tile::Tile;
+use resources::board::Board;
 
 use components::Coordinates;
 use components::Bomb;
@@ -92,6 +98,14 @@ impl BoardPlugin {
                     font,
                 )
             });
+        commands.insert_resource(Board {
+            tile_map,
+            bounds: Bounds2 {
+                position: board_position.xy(),
+                size: board_size,
+            },
+            tile_size,
+        });
     }
 
     fn adaptive_tile_size(
