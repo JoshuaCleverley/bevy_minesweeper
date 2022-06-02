@@ -71,14 +71,16 @@ impl TileMap {
         self.bomb_count
     }
 
-    pub fn safe_square_at(&self, coordinates: Coordinates) -> impl Iterator<Item = Coordinates> {
-        SQUARE_COORDINATES
+    pub fn safe_square_at(&self, coordinates: &Coordinates) -> Vec<Coordinates> {
+        let mut vec: Vec<Coordinates> = SQUARE_COORDINATES
             .iter()
-            .copied()
-            .map(move |tuple| coordinates + tuple)
+            .map(|tuple| *coordinates + *tuple)
+            .collect();
+        vec.dedup();
+        vec
     }
     
-    pub fn is_bomb_at(&self, coordinates: Coordinates) -> bool {
+    pub fn is_bomb_at(&self, coordinates: &Coordinates) -> bool {
         if coordinates.x >= self.width || coordinates.y >= self.height {
             return false;
         }
@@ -86,15 +88,14 @@ impl TileMap {
         self.map[coordinates.y as usize][coordinates.x as usize].is_bomb()
     }
     
-    pub fn bomb_count_at(&self, coordinates: Coordinates) -> u8 {
+    pub fn bomb_count_at(&self, coordinates: &Coordinates) -> u8 {
         if self.is_bomb_at(coordinates) {
             return 0;
         }
     
-        self
-            .safe_square_at(coordinates)
-            .filter(|coord| self.is_bomb_at(*coord))
-            .count() as u8
+        let vec = self.safe_square_at(coordinates);
+        let res = vec.iter().filter(|coord| self.is_bomb_at(coord)).count();
+        res as u8
     }
     
     pub fn set_bombs(&mut self, bomb_count: u16) {
@@ -116,10 +117,10 @@ impl TileMap {
         for y in 0..self.height {
             for x in 0..self.width {
                 let coords = Coordinates { x, y };
-                if self.is_bomb_at(coords) {
+                if self.is_bomb_at(&coords) {
                     continue;
                 }
-                let num = self.bomb_count_at(coords);
+                let num = self.bomb_count_at(&coords);
                 if num == 0 {
                     continue;
                 }

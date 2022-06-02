@@ -3,11 +3,9 @@ pub mod resources;
 
 mod bounds;
 mod systems;
+mod events;
 
-use bevy::prelude::*;
-use bevy::math::Vec3Swizzles;
-use bevy::utils::{ AHashExt, HashMap };
-use bevy::log;
+use crate::events::*;
 
 use bounds::Bounds2;
 
@@ -22,12 +20,21 @@ use components::Coordinates;
 use components::Bomb;
 use components::BombNeighbour;
 
+use bevy::prelude::*;
+use bevy::math::Vec3Swizzles;
+use bevy::utils::{ AHashExt, HashMap };
+use bevy::log;
+
 pub struct BoardPlugin;
 
 impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(Self::create_board);
-        app.add_system(systems::input::input_handling);
+        app
+            .add_startup_system(Self::create_board)
+            .add_system(systems::input::input_handling)
+            .add_system(systems::uncover::trigger_event_handler)
+            .add_system(systems::uncover::uncover_tiles)
+            .add_event::<TileTriggerEvent>();
         log::info!("Loaded Board Plugin!");
     }
 }

@@ -35,11 +35,14 @@ impl Board {
         self.covered_tiles.remove(coords)
     }
 
-    pub fn adjacent_covered_tiles(&self, coord: Coordinates) -> Vec<Entity> {
-        self.tile_map
-            .safe_square_at(coord)
-            .filter_map(|c| self.covered_tiles.get(&c))
-            .copied()
-            .collect()
+    pub fn adjacent_covered_tiles(&self, coord: &Coordinates) -> Vec<Entity> {
+        let vec = self.tile_map.safe_square_at(coord);
+        let mut res = Vec::new();
+        for coord in vec.into_iter() {
+            if let Some(entity) = self.covered_tiles.get(&coord) {
+                res.push(*entity);
+            }
+        }
+        res
     }
 }
